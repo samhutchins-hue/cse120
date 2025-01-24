@@ -157,39 +157,88 @@ total += a[i];
 
   sd x5, 0(x10)  -> store x5 back into memory at address (x10 + 0)
 
+  a = b[0];
+
+  a++;
+
+  b[0] = a;
+
 ]
 
-C) Translate the following C snippets into RV64I assembly. Comment each line.
+== C) Translate the following C snippets into RV64I assembly. Comment each line.
 
 #part[
 
 if (x == 4)
 
 x = 0;
+
+------------------------------------
+
+```
+  li t0, 4
+
+  beq t1, t0, if_condition
+j done
+
+if_condition:
+  li t1, 4
+
+done:
+
+```
 ]
 
 #part[
-
+  
   if (y >= 2)
 
-y = 5;
+  y = 5;
+
+------------------------------------
+
+```
+    li t0, 2
+
+    bge t1, t0, if_condition
+
+    j done
+
+  if_condition:
+    li t1, 5
+
+  done:
+
+```
+
 ]
 
-D) Comment the following assembly, and then translate it into simplified C (without using goto).
+== D) Comment the following assembly, and then translate it into simplified C (without using goto).
 
 #part[
 
-slt x10, x5, x6
+slt x10, x5, x6    -> if x5 is less than x6, store 1 in x10, else, store 0 in x10
 
-beq x10, x0, L1
+beq x10, x0, L1    -> if x10 is equal to x0, branch to label L1
 
-xor x7, x0, x5
+xor x7, x0, x5     -> exclusive or x5 with x0, x0 is always 0, so it copies x5 into x7
 
-j L2
+j L2               -> jump to label L2
 
-L1: or x7, x6, x0
+L1: or x7, x6, x0  -> label L1, store into x7 the result of x6 logical or x0, x0 is always 0, so it copies x6 into x7
 
-L2:
+L2:                -> label L2
+
+------------------------------------
+
+```c
+if (a < b) {
+  c = a;
+} else {
+  c = b;
+}
+
+```
 ]
 
 #question("Question 3 (10 points)")[
@@ -197,17 +246,27 @@ L2:
 
   #part[
 
-    bge r0, a0, L2
+    bge r0, a0, L2  -> if (0 >= a0), branch to label L2
 
-L1: andi t0, a0, 1
+L1: andi t0, a0, 1  -> t0 = (a0 & 1)
 
-  add a1, a1, t0
+  add a1, a1, t0    -> a1 = a1 + t0
 
-  srai a0, a0, 1
+  srai a0, a0, 1    -> arithmetic shift right a0 by 1 (divide by 2)
 
-  blt r0, a0, L1
+  blt r0, a0, L1    -> if (0 < a0), branch back to label L1
 
 L2:
+
+------------------------------------
+
+  ```c
+  while (a > 0) {
+    b = (a & 1);
+    c = c + b;
+    a = a >> 1;
+  }
+  ```
   ]
 
 ]
@@ -223,7 +282,30 @@ long array_total(long* a, long n) {
   return total;
 }
 ```
+------------------------------------
 
+```
+array_total:
+  li t0, 0              // total = 0
+  li t1, 0              // i = 0
+
+loop_start:
+  bge t1, a1, loop_end // if i >= n, exit loop
+
+  slli t2, t1, 3      // t2 = i * 8
+  add t2, a0, t2      // t2 = address of a[i]
+  ld t3, 0(t2)        // load a[i] into t3
+
+  add t0, t0, t3      // total += a[i]
+  addi t1, t1, 1      // i++
+
+  j loop_start        // jump to start of loop
+
+loop_end:
+mv a0, t0             // return total
+ret
+
+```
 #question("Question 4 (12 points)")[
 
   In this problem, you will be writing assembly for the following C code:
