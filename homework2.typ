@@ -38,26 +38,101 @@
   #part[
   0x0083b283
 
-    0000 0000 1000 0011 1011 0010 1000 0011
+    00000000100000111011001010000011
 
-    opcode: 0000011
+    opcode: 0000011: I-type
 
+    | imm[11:0] | rs1 | funct3 | rd | opcode |
 
+    opcode 7 bits: 0000011
+    rd 5 bits: 00101
+    funct3 3 bits: 011
+    rs1 5 bits: 00111
+    imm[11:0] 12 bits:000000001000
+
+    ld x5 x7 8
 
   ]
 
   #part[
   0x0062c2b3
+
+  000000000110 00101 100 00101 0110011
+
+
+| funct7|	rs2|	rs1|	funct3|	rd|	opcode|
+
+  opcode 7 bits: 0110011
+
+  rd 5 bits: 00101 
+
+  funct3 3 bits: 100 
+
+  rs1 5 bits: 00101 
+
+  rs2: 00110 
+
+  funct7: 0000000
+
+  x5 = t0,
+  x6 = t1
+
+  xor t0 t0 t1
+
   ]
 
   == C) Assemble the following assembly into encoded RV64I instructions. Be sure to show your work
 
   #part[
     addi x10, x10, 8
+
+    addi -> I-type
+
+    | imm[11:0] | rs1 | funct3 | rd | opcode |
+
+    imm[11:0] = 000000001000
+
+    rs1 = 01010
+
+    funct3 = 000
+
+    rd = 01010
+
+    opcode = 0010011
+
+    0000 0000 1000 0101 0000 0101 0001 0011
+
+    0x00850513
+
   ]
 
   #part[
     sd x11, 16(x10)
+
+    opcode = 0100011
+    funct3 = 011
+
+    S-type
+
+    |imm[11:5]| rs2| rs1| funct3| imm[4:0]| opcode| 
+
+    imm[11:5] = 0010000
+
+    rs2 = 01010
+
+    rs1 = 01011
+
+    funct3 = 011
+
+    imm[4:0] = 10000
+
+    opcode = 0100011
+
+    0010 0000 1010 0101 1011 1000 0010 0011
+
+    0x20a5b823
+
+
   ]
 ]
 
@@ -76,11 +151,11 @@ total += a[i];
 
 #part[
   
-  ld x5, 0(x10)
+  ld x5, 0(x10)  -> load into x5 the value in memory at address (x10 + 0)
 
-  addi x5, x5, 1
+  addi x5, x5, 1 -> increment the value in x5 by 1
 
-  sd x5, 0(x10)
+  sd x5, 0(x10)  -> store x5 back into memory at address (x10 + 0)
 
 ]
 
