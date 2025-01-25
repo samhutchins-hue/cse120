@@ -303,7 +303,7 @@ loop_start:
 
 loop_end:
 mv a0, t0             // return total
-ret
+ret a0
 
 ```
 #question("Question 4 (12 points)")[
@@ -323,10 +323,35 @@ long foo(long x, long y) {
 }
 
   ```
+
 When possible, strive to reduce the instruction count while maintaining the original
 program intent (recursive function). Be sure to comment each line of your assembly
 and to respect the calling convention.
   #part[
+
+  ```
+  foo:
+    beq a0, a1, return_x  // if x == y, return x
+    li t0, 0
+    bgt a0, a0, x_greater // if x > y, branch to x_greater label
+                          // otherwise, continue with execution which will encounter y_greater label
+                          // ensures one less jump for optimzation
+  y_greater:              // label for if y > x
+    sub a1, a1, a0        // y = y - x
+    call foo              // foo(x, y-x)
+    j end_foo             // jump to ret
+
+  x_greater:              // label if x > y
+    sub a0, a0, a1        // x = x - y
+    call foo              // foo(x-y, y)
+                          // no jump to a return label as next instruction is a ret.
+                          // this is for optimization
+  end_foo:                // for when returning foo
+    ret
+
+  return_x:               // for when returning x
+    ret
+  ```
 
   ]
 
